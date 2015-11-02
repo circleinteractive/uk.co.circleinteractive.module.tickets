@@ -1,0 +1,8 @@
+<menu>
+  <item>
+     <path>civicrm/admin/event/ticket/preview</path>
+     <title>Preview CiviCRM Event Ticket</title>
+     <page_callback>CRM_Event_Ticket::preview</page_callback>
+     <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+</menu>
