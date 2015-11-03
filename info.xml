@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
  <extension key="uk.co.circleinteractive.module.tickets" type="module">
-  <downloadUrl>http://www.circle-interactive.co.uk/sites/circle-interactive.co.uk/files/civicrm_extensions/uk.co.circleinteractive.module.tickets.zip</downloadUrl>
+  <downloadUrl>http://extensions.circle-interactive.co.uk/uk.co.circleinteractive.module.tickets.zip</downloadUrl>
   <file>event_tickets</file>
   <name>Event Tickets</name>
   <description>Customizable PDF tickets for CiviCRM events</description>
@@ -17,9 +17,12 @@
   </maintainer>
   <releaseDate>2013-05-28</releaseDate>
   <version>1.0</version>
-  <develStage>alpha</develStage>
+  <develStage>beta</develStage>
   <compatibility>
     <ver>4.2</ver>
+    <ver>4.3</ver>
+    <ver>4.4</ver>
+    <ver>4.5</ver>
   </compatibility>
   <comments>For support, please contact project team on the forums. (http://forum.civicrm.org)</comments>
 </extension>

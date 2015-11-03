@@ -15,7 +15,7 @@ function event_tickets_civicrm_alterMailParams(&$params) {
 
     static $runCount = 0;
 
-    watchdog('andyw', 'alterMailParams - params = <pre>' . print_r($params, true) . '</pre>');
+    //watchdog('andyw', 'alterMailParams - params = <pre>' . print_r($params, true) . '</pre>');
 
     switch(true) {
         
@@ -161,7 +161,7 @@ function event_tickets_civicrm_config() {
 
     // Add our templates directory 
     $template    = &CRM_Core_Smarty::singleton();
-    $templateDir = __DIR__ . DIRECTORY_SEPARATOR . 'templates';
+    $templateDir = __DIR__ . '/templates/' . _event_tickets_crm_version();
     
     if (is_array($template->template_dir))
         array_unshift($template->template_dir, $templateDir);
@@ -171,11 +171,6 @@ function event_tickets_civicrm_config() {
     // Add our php directory to include path
     $include_path = __DIR__ . DIRECTORY_SEPARATOR . 'php' . PATH_SEPARATOR . get_include_path();
     set_include_path($include_path);
-
-    $field_config_location = __DIR__ . '/../field-config.php';
-    if (file_exists($field_config_location))
-        include_once $field_config_location;
-    else throw new Exception('Field config not found');
 
 }
 
@@ -325,4 +320,12 @@ function event_tickets_load_templates() {
     ksort($templates);
     return $templates;
     
+}
+
+/**
+ * Get CiviCRM version as float (1 decimal place)
+ */
+function _event_tickets_crm_version() {
+    $crmversion = explode('.', ereg_replace('[^0-9\.]','', CRM_Utils_System::version()));
+    return floatval($crmversion[0] . '.' . $crmversion[1]);
 }
