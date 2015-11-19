@@ -24,13 +24,11 @@ function event_tickets_civicrm_alterMailParams(&$params) {
             
             if ($template_class = event_tickets_get_template_for_event($params['tplParams']['event']['id'])) {
 
-                /* BDATiX Specific code - attach additional participant tickets */
-                
-                // Ensure hook runs only once (ie: not for any additional participants)
+                // Ensure mail sends only for main participant (ie: not for any additional participants)
                 if (isset($params['tplParams']['params']['additionalParticipant']) &&
                     !empty($params['tplParams']['params']['additionalParticipant'])
                    ) {
-                    unset($params['toEmail']);
+                    $params['abortMailSend'] = true;
                     return;
                 }
 
@@ -50,6 +48,7 @@ function event_tickets_civicrm_alterMailParams(&$params) {
                 $temp_files            = array();
 
                 $ticket = new $template_class;
+                $tmp_filename = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5(microtime(true)) . '.pdf';
 
                 // Loop through participants and attach all tickets to the main participant email
                 foreach ($participants as $participant_id) {
@@ -61,42 +60,45 @@ function event_tickets_civicrm_alterMailParams(&$params) {
                         $num_participants = 1;
 
                     for ($i=0;$i<$num_participants;$i++) { 
+
                         $pdf = array(
                             'participant_id'         => $participant_id,
                             'event_id'               => $params['tplParams']['event']['id'],
-                            'filename'               => sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5(microtime(true)) . '.pdf',
-                            'additional_participants_same_person' => 
-                                isset($params['tplParams']['additional_participants_same_person']) ?
-                                    $params['tplParams']['additional_participants_same_person'] : 0
+                            'filename'               => $tmp_filename,
+                            //'additional_participants_same_person' => 
+                            //    isset($params['tplParams']['additional_participants_same_person']) ?
+                            //        $params['tplParams']['additional_participants_same_person'] : 0,
+                            'additional_participants_same_person' => 0,
+                            'num_participants' => $num_participants
                         );
                         $ticket->create($pdf);
+                        $temp_files[] = $pdf['filename'];
                     }
                     
 
                 } // end foreach
-                
-                // output to temp file (this will be deleted after it's been attached to the email)
-                $ticket->pdf->Output($pdf['filename'], 'F');
-                $temp_files[] = $pdf['filename'];
 
-                // attach the new attachment ..
-                $params['attachments'] = array(array(
-                    'fullPath'  => $pdf['filename'],
-                    'mime_type' => 'application/pdf',
-                    'cleanName' => ts(
-                        'Ticket%1 for %2.pdf', 
-                        array(
-                            1 => count($participants) > 1 ? 's' : '',
-                            2 => $params['tplParams']['event']['title'],
-                        )
+            }
+
+            // output to temp file (this will be deleted after it's been attached to the email)
+            $ticket->pdf->Output($pdf['filename'], 'F');
+
+            // attach the new attachment ..
+            $params['attachments'] = array(array(
+                'fullPath'  => $pdf['filename'],
+                'mime_type' => 'application/pdf',
+                'cleanName' => ts(
+                    'Ticket%1 for %2.pdf', 
+                    array(
+                        1 => count($participants) > 1 ? 's' : '',
+                        2 => $params['tplParams']['event']['title'],
                     )
-                ));
+                )
+            ));
 
-                register_shutdown_function('event_tickets_cleanup', $temp_files);
-                /* end BDATiX specific code */
-                break;
+            register_shutdown_function('event_tickets_cleanup', $temp_files);
 
-            }        
+            break;        
     
     }
     

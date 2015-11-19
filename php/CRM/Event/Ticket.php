@@ -47,13 +47,14 @@ abstract class CRM_Event_Ticket {
         // set some basic defaults if $format not populated
         $this->format = array_merge(
             array(
-                'paper-size'   => 'A6',
-                'metric'       => 'mm',
-                'margin-left'  => 5,
-                'margin-top'   => 5,
-                'margin-right' => 5,
-                'font-size'    => 10,
-                'orientation'  => 'L'
+                'paper-size'    => 'A4',
+                'metric'        => 'mm',
+                'margin-left'   => 5,
+                'margin-top'    => 5,
+                'margin-bottom' => 5,
+                'margin-right'  => 5,
+                'font-size'     => 10,
+                'orientation'   => 'L'
             ),
             $this->format
         );
@@ -122,11 +123,6 @@ abstract class CRM_Event_Ticket {
 
         //$page_height = $dimensions['hk'] - $dimensions['tm'] - $dimensions['bm'];
         //$page_width  = $dimensions['wk'] - $dimensions['lm'] - $dimensions['rm'];
-
-        // Not sure why the available page height is getting miscalculated, but I don't have time to work it out,
-        // (and no, it's not to do with margins before you go jumping in thinking you're all clever)
-        // so the variable below adjusts for the error
-        $fudge_factor = 9;
         
         if (!($batch_count % $num_per_page) or $is_reprint or $this->preview) {
 
@@ -136,10 +132,11 @@ abstract class CRM_Event_Ticket {
         
         } else {
             
-            if (!($batch_count % $cols))
-                $pdf->top += ($page_height / $rows) - $fudge_factor;
-            else
-                $pdf->left += ($page_width / $cols) - $fudge_factor;
+            if (!($batch_count % $cols)) {
+                $pdf->top += ((($page_height/* - $this->format['margin-top'] - $this->format['margin-bottom']*/) / ($rows - 1)) * 1.35);
+                watchdog('andyw', 'pdf->top = ' . $pdf->top);
+            } else
+                $pdf->left += ((($page_width/* - $this->format['margin-left'] - $this->format['margin-right']*/) / ($cols - 1)) * 1.35);
         
         }
 

@@ -21,7 +21,11 @@ class CRM_Event_Ticket_BoxOffice extends CRM_Event_Ticket {
             'margin-left'  => 0,
             'margin-right' => 0,
             'font-size'    => 8,
-            'orientation'  => 'P'
+            'orientation'  => 'P',
+            'multiple'     => array(
+                'cols' => 1,
+                'rows' => 8
+            )
         );
         
         parent::__construct();
@@ -85,7 +89,7 @@ class CRM_Event_Ticket_BoxOffice extends CRM_Event_Ticket {
         //foreach (array('contact', 'contribution', 'event', 'participant') as $entity)
         //    watchdog('andyw', $entity . ' = <pre>' . print_r($this->$entity, true) . '</pre>');
 
-        $pdf->addTTFfont($this->fonts_dir . DIRECTORY_SEPARATOR . 'VT323-Regular.ttf', '', '', 32);
+        //$pdf->addTTFfont(__DIR__ . '/fonts/arcade.ttf', '', '', 32);
         //$pdf->addTTFfont($this->fonts_dir . DIRECTORY_SEPARATOR . 'Arcade.ttf', '', '', 32);
         $pdf->addTTFfont($this->fonts_dir . DIRECTORY_SEPARATOR . 'SourceSansPro-Regular.ttf', '', '', 32);
         $pdf->addTTFfont($this->fonts_dir . DIRECTORY_SEPARATOR . 'SourceSansPro-Semibold.ttf', '', '', 32);
@@ -94,12 +98,15 @@ class CRM_Event_Ticket_BoxOffice extends CRM_Event_Ticket {
         $this->primary_font    = 'arcade';
         $this->secondary_font  = 'sourcesansprob';
         $this->barcode_font    = 'sourcesansprosemib';
-        //$pdf->SetFont($this->primary_font, '', $this->fontSize, true);
+
+        $this->primary_font = $pdf->addTTFfont(__DIR__ . '/fonts/VT323-Regular.ttf', '', '', 32);
+        
         
         //echo dirname(__FILE__) . '/fonts/dotmatri.php<br />';
         //exit;
         //$pdf->addFont('dotmatri', '', dirname(__FILE__) . '/fonts/dotmatri.php');
-        $pdf->addFont('arcade', '', dirname(__FILE__) . '/fonts/arcade.php');
+        //$pdf->addFont('arcade');
+        $pdf->SetFont($this->primary_font, '', $this->fontSize, true);
         $pdf->SetTextColor(64, 64, 64);
 
     }
@@ -283,7 +290,7 @@ class CRM_Event_Ticket_BoxOffice extends CRM_Event_Ticket {
             //dirname(__FILE__) . '/concert49.jpg',     // file
             implode(DIRECTORY_SEPARATOR, array(
                 CRM_Core_Config::singleton()->extensionsDir,
-                'com.uk.andyw.tickets',
+                'uk.co.circleinteractive.module.tickets',
                 'images',
                 'logo2.png'
             )),
